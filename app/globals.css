@@ -53,6 +53,46 @@ body::-webkit-scrollbar {
   @apply border border-white/20;
 }
 
+/* Button text rollover */
+.button-label {
+  transition:
+    transform 250ms cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.button-label-rest {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.button-label-hover {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .animated-button:hover .button-label-rest {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .animated-button:hover .button-label-hover {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-label {
+    transition-property: opacity;
+  }
+
+  .animated-button .button-label,
+  .animated-button:hover .button-label {
+    transform: none;
+  }
+}
+
 .nav-hover-btn {
   @apply relative ms-10 cursor-pointer font-general text-xs uppercase text-blue-50
     after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full

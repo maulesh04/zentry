@@ -43,7 +43,7 @@ const Contact = () => {
             Let's b<b>u</b>ild the <br/> new era of <br/> g<b>a</b>ming t<b>o</b>gether
           </p>
 
-          <Button id="contact-button" title="contact us" containerClass="mt-10 cursor-pointer"/>
+          <Button id="contact-button" title="contact us" containerClass="mt-10 cursor-pointer" shapeMorph/>
         </div>
       </div>
     </div>

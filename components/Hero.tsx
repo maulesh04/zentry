@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Button from "./Button";
 import { TiLocationArrow } from "react-icons/ti";
 import gsap from 'gsap';
@@ -15,14 +15,18 @@ const Hero = () => {
   const [currentIndex, setcurrentIndex] = useState(1);
   const [hasClicked, sethasClicked] = useState(false);
   const [isLoading, setisLoading] = useState(true);
-  const [loadedVideos, setloadedVideos] = useState(0);
   
   const totalVideos = 4;
   const nextVideoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleVideoLoad = () => {
-    setloadedVideos((prev) => prev+1);
-  }
+  const handleVideoLoad = () => setisLoading(false);
+
+  const backgroundVideoRef = useCallback((video: HTMLVideoElement | null) => {
+    // Local/cached media can finish loading before React attaches its handlers.
+    if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setisLoading(false);
+    }
+  }, []);
 
   const upcomingVideoIndex = (currentIndex % totalVideos) + 1;
 
@@ -31,12 +35,6 @@ const Hero = () => {
     setcurrentIndex(upcomingVideoIndex)
   }
 
-  useEffect(() => {
-    if(loadedVideos >= 3){
-        setisLoading(false)
-    }
-  }, [loadedVideos])
-  
   useGSAP(() => {
     if(hasClicked){
         gsap.set('#next-video', {visibility: 'visible'});
@@ -74,7 +72,9 @@ const Hero = () => {
         ease: 'power1.inOut',
         scrollTrigger: {
             trigger: '#video-frame-rounder',
-            start: 'center center',
+            // Mobile 100dvh can be shorter than ScrollTrigger's 100vh viewport.
+            // Keep the start on-page so the filter cannot activate at scroll zero.
+            start: 'clamp(center center)',
             end: 'bottom center',
             scrub: true,
 
@@ -120,7 +120,6 @@ const Hero = () => {
                             muted
                             id="current-video"
                             className="size-64 origin-center scale-150 object-cover object-center"
-                            onLoadedData={handleVideoLoad}
                         />
                     </div>
                     </div>
@@ -131,9 +130,9 @@ const Hero = () => {
                         muted
                         id="next-video"
                         className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
-                        onLoadedData={handleVideoLoad}
                     />
                     <video
+                        ref={backgroundVideoRef}
                         src={getVideoSrc(currentIndex)}
                         autoPlay
                         loop
